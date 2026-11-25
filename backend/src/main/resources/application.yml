@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: casa-libertango-tourism-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/turismo_db}
+    username: ${DB_USERNAME:turismo_app}
+    password: ${DB_PASSWORD:local-tourism-password}
+  flyway:
+    enabled: true
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}

@@ -1,0 +1,75 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: postgres
+      TOURISM_DB_USER: ${TOURISM_DB_USER:?Set TOURISM_DB_USER in .env}
+      TOURISM_DB_PASSWORD: ${TOURISM_DB_PASSWORD:?Set TOURISM_DB_PASSWORD in .env}
+      CMS_DB_USER: ${CMS_DB_USER:?Set CMS_DB_USER in .env}
+      CMS_DB_PASSWORD: ${CMS_DB_PASSWORD:?Set CMS_DB_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/turismo_db
+      DB_USERNAME: ${TOURISM_DB_USER}
+      DB_PASSWORD: ${TOURISM_DB_PASSWORD}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+  cms:
+    build:
+      context: ./cms
+    environment:
+      HOST: 0.0.0.0
+      PORT: 1337
+      APP_KEYS: ${CMS_APP_KEYS}
+      API_TOKEN_SALT: ${CMS_API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${CMS_ADMIN_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${CMS_TRANSFER_TOKEN_SALT}
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: cms_db
+      DATABASE_USERNAME: ${CMS_DB_USER}
+      DATABASE_PASSWORD: ${CMS_DB_PASSWORD}
+      DATABASE_SSL: "false"
+    ports:
+      - "1337:1337"
+    volumes:
+      - cms_uploads:/app/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      CMS_API_URL: http://cms:1337/api
+      CMS_PUBLIC_URL: ${CMS_PUBLIC_URL:-http://localhost:1337}
+      CMS_API_TOKEN: ${CMS_API_TOKEN:-}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - cms
+
+volumes:
+  postgres_data:
+  cms_uploads:

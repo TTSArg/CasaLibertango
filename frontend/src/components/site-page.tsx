@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   copy,
@@ -36,8 +37,18 @@ export function SitePage({
       <header className="site-header">
         <div className="header-inner">
           <Link className="brand" href={`/${locale}`} aria-label="Casa Libertango">
-            <span className="brand-name">Casa Libertango</span>
-            <span className="brand-note">{languageCopy.footer}</span>
+            <Image
+              className="brand-logo"
+              src="/favicon.svg"
+              alt=""
+              width={56}
+              height={56}
+              priority
+            />
+            <span className="brand-copy">
+              <span className="brand-name">Casa Libertango</span>
+              <span className="brand-note">{languageCopy.footer}</span>
+            </span>
           </Link>
           <div className="header-actions">
             <nav

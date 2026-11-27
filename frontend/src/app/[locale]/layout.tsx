@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Casa Libertango | Buenos Aires",
   description:
     "Séjournez à Casa Libertango et découvrez Buenos Aires avec Eva, danseuse et professeure de tango.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export function generateStaticParams() {

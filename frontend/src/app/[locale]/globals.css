@@ -41,7 +41,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   gap: 24px;
   margin: auto;
 }
-.brand { display: block; color: white; text-decoration: none; }
+.brand { display: flex; align-items: center; gap: 12px; color: white; text-decoration: none; }
+.brand-logo { display: block; flex: 0 0 auto; border-radius: 13px; }
+.brand-copy { display: block; }
 .brand-name {
   display: block;
   font-family: var(--garet);
